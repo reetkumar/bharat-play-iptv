@@ -67,7 +67,24 @@ useEffect(() => {
             );
           });
           
-          setChannels(indianChannels);
+          const seen = new Map<string, Channel>();
+          indianChannels.forEach(channel => {
+            const name = channel.name.toLowerCase().replace(/\s*\(?\d+p\)?/g, '').replace(/\s*hd$/g, '').trim();
+            const existing = seen.get(name);
+            if (!existing) {
+              seen.set(name, channel);
+            } else {
+              const existingHasHD = existing.name.toLowerCase().includes('1080') || existing.name.toLowerCase().includes('hd');
+              const newHasHD = channel.name.toLowerCase().includes('1080') || channel.name.toLowerCase().includes('hd');
+              if (newHasHD && !existingHasHD) {
+                seen.set(name, channel);
+              }
+            }
+          });
+          
+          const filtered = Array.from(seen.values());
+          
+          setChannels(filtered);
           setCategories(DEFAULT_CATEGORIES);
         }
       } catch (e) {
