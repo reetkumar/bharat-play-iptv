@@ -44,31 +44,13 @@ useEffect(() => {
 
     const loadChannels = async () => {
       try {
-        const response = await fetch('https://iptv-org.github.io/iptv/index.m3u');
+        const response = await fetch('https://raw.githubusercontent.com/FunctionError/PiratesTv/main/combined_playlist.m3u');
         if (response.ok) {
           const content = await response.text();
           const parsed = parseM3U(content);
           
-          const indianChannels = parsed.filter(channel => {
-            const url = channel.url.toLowerCase();
-            const name = channel.name.toLowerCase();
-            const tvgId = channel.tvgId?.toLowerCase() || '';
-            const groupTitle = channel.groupTitle?.toLowerCase() || '';
-            
-            return (
-              url.includes('.in') ||
-              name.includes('india') ||
-              name.includes('indian') ||
-              name.includes('hindi') ||
-              name.includes('bollywood') ||
-              tvgId.includes('.in') ||
-              (groupTitle.includes('india') && !groupTitle.includes('indiana')) ||
-              groupTitle.includes('hindi')
-            );
-          });
-          
           const seen = new Map<string, Channel>();
-          indianChannels.forEach(channel => {
+          parsed.forEach(channel => {
             const name = channel.name.toLowerCase().replace(/\s*\(?\d+p\)?/g, '').replace(/\s*hd$/g, '').trim();
             const existing = seen.get(name);
             if (!existing) {

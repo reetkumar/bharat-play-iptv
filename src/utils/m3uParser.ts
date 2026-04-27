@@ -10,16 +10,20 @@ export function parseM3U(content: string): Channel[] {
 
     if (line.startsWith('#EXTINF:')) {
       // Extract tvg-id
-      const tvgIdMatch = line.match(/tvg-id="([^"]*)"/i);
+      const tvgIdMatch = line.match(/tvg-id\s*=\s*"([^"]*)"/i);
       if (tvgIdMatch) currentChannel.tvgId = tvgIdMatch[1];
 
-      // Extract tvg-logo
-      const logoMatch = line.match(/tvg-logo="([^"]*)"/i);
+      // Extract tvg-logo (handle malformed entries where attributes lack spaces)
+      const logoMatch = line.match(/tvg-logo\s*=\s*"([^"]*)"/i);
       if (logoMatch) currentChannel.logo = logoMatch[1];
 
-      // Extract group-title (category)
-      const groupMatch = line.match(/group-title="([^"]*)"/i);
-      if (groupMatch) currentChannel.groupTitle = groupMatch[1];
+      // Extract group-title (category) - handle duplicate/malformed entries
+      const groupMatches = line.match(/group-title\s*=\s*"([^"]*)"/gi);
+      if (groupMatches && groupMatches.length > 0) {
+        const lastGroup = groupMatches[groupMatches.length - 1];
+        const groupMatch = lastGroup.match(/group-title\s*=\s*"([^"]*)"/i);
+        if (groupMatch) currentChannel.groupTitle = groupMatch[1];
+      }
 
       // Extract channel name (everything after the last comma)
       let name = '';
