@@ -15,7 +15,9 @@ export function parseM3U(content: string): Channel[] {
 
       // Extract tvg-logo (handle malformed entries where attributes lack spaces)
       const logoMatch = line.match(/tvg-logo\s*=\s*"([^"]*)"/i);
-      if (logoMatch) currentChannel.logo = logoMatch[1];
+      if (logoMatch && logoMatch[1] && /^https?:\/\/.+/i.test(logoMatch[1])) {
+        currentChannel.logo = logoMatch[1];
+      }
 
       // Extract group-title (category) - handle duplicate/malformed entries
       const groupMatches = line.match(/group-title\s*=\s*"([^"]*)"/gi);
